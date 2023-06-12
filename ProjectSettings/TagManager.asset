@@ -11,9 +11,9 @@ TagManager:
   - 
   - Water
   - UI
-  - 
-  - 
-  - 
+  - Platforms
+  - Background
+  - Background Objects
   - 
   - 
   - 
@@ -40,4 +40,16 @@ TagManager:
   m_SortingLayers:
   - name: Default
     uniqueID: 0
+    locked: 0
+  - name: Background
+    uniqueID: 1447433777
+    locked: 0
+  - name: Background Objects
+    uniqueID: 1684013037
+    locked: 0
+  - name: Lava
+    uniqueID: 2986847185
+    locked: 0
+  - name: Platforms
+    uniqueID: 4269396615
     locked: 0
