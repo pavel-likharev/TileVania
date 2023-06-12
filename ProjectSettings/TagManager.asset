@@ -47,6 +47,9 @@ TagManager:
   - name: Background Objects
     uniqueID: 1684013037
     locked: 0
+  - name: Player
+    uniqueID: 1708752305
+    locked: 0
   - name: Lava
     uniqueID: 2986847185
     locked: 0
