@@ -14,7 +14,7 @@ TagManager:
   - Platforms
   - Background
   - Background Objects
-  - 
+  - Ladder
   - 
   - 
   - 
@@ -46,6 +46,9 @@ TagManager:
     locked: 0
   - name: Background Objects
     uniqueID: 1684013037
+    locked: 0
+  - name: Ladder
+    uniqueID: 2054137987
     locked: 0
   - name: Player
     uniqueID: 1708752305
