@@ -15,6 +15,7 @@ public class PlayerController : MonoBehaviour
     Rigidbody2D playerRigidbody;
     Animator playerAnimator;
     CapsuleCollider2D playerCollider;
+    BoxCollider2D playerColliderJump;
     float gravityScale;
 
     void Awake()
@@ -22,6 +23,7 @@ public class PlayerController : MonoBehaviour
         playerRigidbody = GetComponent<Rigidbody2D>();
         playerAnimator = GetComponent<Animator>();
         playerCollider = GetComponent<CapsuleCollider2D>();
+        playerColliderJump = GetComponent<BoxCollider2D>();
 
         gravityScale = playerRigidbody.gravityScale;
     }
@@ -31,6 +33,8 @@ public class PlayerController : MonoBehaviour
         Run();
         FlipSprite();
         ClimbLadder();
+
+        playerAnimator.SetBool("isJumping", PlayerHasVerticalSpeed());
 
     }
 
@@ -70,7 +74,6 @@ public class PlayerController : MonoBehaviour
         else 
         {
             playerRigidbody.gravityScale = gravityScale;
-            Debug.Log("endclimb");
             playerAnimator.SetBool("isClimbingPause", false);
             playerAnimator.SetBool("isClimbing", false);
         }
@@ -103,7 +106,7 @@ public class PlayerController : MonoBehaviour
 
     bool IsTouchingPlatforms()
     {
-        return playerCollider.IsTouchingLayers(LayerMask.GetMask("Platforms"));
+        return playerColliderJump.IsTouchingLayers(LayerMask.GetMask("Platforms"));
     }
 
     private void OnCollisionEnter2D(Collision2D collision)
