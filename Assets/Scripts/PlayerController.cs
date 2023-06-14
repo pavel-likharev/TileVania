@@ -9,23 +9,21 @@ public class PlayerController : MonoBehaviour
 {
     [SerializeField] float movementSpeed = 5f;
     [SerializeField] float jumpSpeed = 5f;
+    [SerializeField] float climbSpeed = 5f;
     
-
     Vector2 moveInput;
     Rigidbody2D playerRigidbody;
     Animator playerAnimator;
     CapsuleCollider2D playerCollider;
+    float gravityScale;
 
     void Awake()
     {
         playerRigidbody = GetComponent<Rigidbody2D>();
         playerAnimator = GetComponent<Animator>();
         playerCollider = GetComponent<CapsuleCollider2D>();
-    }
 
-    void Start()
-    {
-                
+        gravityScale = playerRigidbody.gravityScale;
     }
 
     void Update()
@@ -34,8 +32,6 @@ public class PlayerController : MonoBehaviour
         FlipSprite();
         ClimbLadder();
 
-        if (!PlayerHasVerticalSpeed())
-            playerAnimator.SetBool("isJumping", false);
     }
 
     void OnMove(InputValue value)
@@ -63,10 +59,20 @@ public class PlayerController : MonoBehaviour
     {
         if (playerCollider.IsTouchingLayers(LayerMask.GetMask("Ladder")))
         {
-            Vector2 playerVelocity = new Vector2(playerRigidbody.velocity.x, moveInput.y * movementSpeed);
-            playerRigidbody.velocity = playerVelocity;
+            Vector2 climbVelocity = new Vector2(playerRigidbody.velocity.x, moveInput.y * climbSpeed);
+            playerRigidbody.velocity = climbVelocity;
+            playerRigidbody.gravityScale = 0;
 
             playerAnimator.SetBool("isClimbing", PlayerHasVerticalSpeed());
+            playerAnimator.SetBool("isClimbingPause", !PlayerHasVerticalSpeed());
+
+        }
+        else 
+        {
+            playerRigidbody.gravityScale = gravityScale;
+            Debug.Log("endclimb");
+            playerAnimator.SetBool("isClimbingPause", false);
+            playerAnimator.SetBool("isClimbing", false);
         }
     }
 
@@ -92,11 +98,20 @@ public class PlayerController : MonoBehaviour
 
     bool PlayerHasVerticalSpeed()
     {
-        return Mathf.Abs(playerRigidbody.velocity.y) > 1;
+        return Mathf.Abs(playerRigidbody.velocity.y) > 2;
     }
 
     bool IsTouchingPlatforms()
     {
         return playerCollider.IsTouchingLayers(LayerMask.GetMask("Platforms"));
+    }
+
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        if (IsTouchingPlatforms())
+        {
+            Debug.Log("bug");
+            playerAnimator.SetBool("isJumping", false);
+        }
     }
 }
