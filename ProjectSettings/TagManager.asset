@@ -17,7 +17,7 @@ TagManager:
   - Ladder
   - Player
   - Bouncing
-  - 
+  - Enemy
   - 
   - 
   - 
@@ -55,6 +55,9 @@ TagManager:
     locked: 0
   - name: Player
     uniqueID: 1708752305
+    locked: 0
+  - name: Enemy
+    uniqueID: 2694890761
     locked: 0
   - name: Lava
     uniqueID: 2986847185

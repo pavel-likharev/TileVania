@@ -10,6 +10,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] float movementSpeed = 5f;
     [SerializeField] float jumpSpeed = 5f;
     [SerializeField] float climbSpeed = 5f;
+    [SerializeField] Vector2 deathkick = new Vector2(10f, 10f);
     
     Vector2 moveInput;
     Rigidbody2D playerRigidbody;
@@ -17,6 +18,8 @@ public class PlayerController : MonoBehaviour
     CapsuleCollider2D playerCollider;
     BoxCollider2D playerColliderJump;
     float gravityScale;
+
+    bool isALive = true;
 
     void Awake()
     {
@@ -30,9 +33,12 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
+        if (!isALive) { return; }
+
         Run();
         FlipSprite();
         ClimbLadder();
+
 
         playerAnimator.SetBool("isJumping", PlayerHasVerticalSpeed());
 
@@ -45,6 +51,8 @@ public class PlayerController : MonoBehaviour
 
     void OnJump(InputValue value)
     {
+        if (!isALive) { return; }
+
         if (value.isPressed && IsTouchingPlatforms())
         {
             Jump();
@@ -104,17 +112,38 @@ public class PlayerController : MonoBehaviour
         return Mathf.Abs(playerRigidbody.velocity.y) > 2;
     }
 
+    void Die()
+    {
+        isALive = false;
+        playerAnimator.SetTrigger("Dying");
+        playerRigidbody.velocity = deathkick;
+    }
+
     bool IsTouchingPlatforms()
     {
         return playerColliderJump.IsTouchingLayers(LayerMask.GetMask("Platforms"));
+    }
+
+    bool IsTouchingEnemy()
+    {
+        return playerCollider.IsTouchingLayers(LayerMask.GetMask("Enemy"));
+    }
+
+    bool IsTouchingLava()
+    {
+        return playerCollider.IsTouchingLayers(LayerMask.GetMask("Lava"));
     }
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
         if (IsTouchingPlatforms())
         {
-            Debug.Log("bug");
             playerAnimator.SetBool("isJumping", false);
+        }
+
+        if (IsTouchingLava() && isALive || IsTouchingEnemy() && isALive)
+        {
+            Die();
         }
     }
 }
