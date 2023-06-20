@@ -10,13 +10,17 @@ public class PlayerController : MonoBehaviour
     [SerializeField] float movementSpeed = 5f;
     [SerializeField] float jumpSpeed = 5f;
     [SerializeField] float climbSpeed = 5f;
+    [SerializeField] float shootSpeed = 5f;
     [SerializeField] Vector2 deathkick = new Vector2(10f, 10f);
+    [SerializeField] GameObject bulletPrefab;
+    [SerializeField] GameObject bulletSpawnPoint;
     
     Vector2 moveInput;
     Rigidbody2D playerRigidbody;
     Animator playerAnimator;
     CapsuleCollider2D playerCollider;
     BoxCollider2D playerColliderJump;
+    
     float gravityScale;
 
     bool isALive = true;
@@ -59,6 +63,17 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    void OnFire(InputValue value)
+    {
+        if (!isALive) { return; }
+
+        if (value.isPressed)
+        {
+            Fire();
+
+        }
+    }
+
     void Run()
     {
         Vector2 playerVelocity = new Vector2(moveInput.x * movementSpeed, playerRigidbody.velocity.y);
@@ -74,6 +89,7 @@ public class PlayerController : MonoBehaviour
             Vector2 climbVelocity = new Vector2(playerRigidbody.velocity.x, moveInput.y * climbSpeed);
             playerRigidbody.velocity = climbVelocity;
             playerRigidbody.gravityScale = 0;
+
 
             playerAnimator.SetBool("isClimbing", PlayerHasVerticalSpeed());
             playerAnimator.SetBool("isClimbingPause", !PlayerHasVerticalSpeed());
@@ -94,11 +110,22 @@ public class PlayerController : MonoBehaviour
         
     }
 
+    void Fire()
+    {
+        if (playerAnimator.GetBool("isRunning"))
+            playerAnimator.Play("PlayerRunAndShoot");
+        else
+            playerAnimator.Play("PlayerShoot");
+
+        Instantiate(bulletPrefab, bulletSpawnPoint.transform.position, transform.rotation);
+    }
+
     void FlipSprite()
     {
         if (PlayerHasHorizontalSpeed())
         {
-            transform.localScale = new Vector2(Mathf.Sign(playerRigidbody.velocity.x), 1f);
+            Vector2 vectorFlip = new Vector2(Mathf.Sign(playerRigidbody.velocity.x), 1f);
+            transform.localScale = vectorFlip;        
         }
     }
 
