@@ -30,11 +30,12 @@ public class EnemyMovement : MonoBehaviour
     {
         return enemyCollider.IsTouchingLayers(LayerMask.GetMask("Platforms"));
     }
-    private void OnTriggerEnter2D(Collider2D collision)
+
+    void OnTriggerExit2D(Collider2D collision)
     {
-        if (IsTouchingPlatforms())
+        if (collision.tag == "Platforms")
         {
-            moveSpeed = - moveSpeed;
+            moveSpeed = -moveSpeed;
             FlipEnemyBody();
         }
     }

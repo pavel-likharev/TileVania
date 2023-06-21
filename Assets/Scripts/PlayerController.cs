@@ -20,6 +20,7 @@ public class PlayerController : MonoBehaviour
     Animator playerAnimator;
     CapsuleCollider2D playerCollider;
     BoxCollider2D playerColliderJump;
+
     
     float gravityScale;
 
