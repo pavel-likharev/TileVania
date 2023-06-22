@@ -22,7 +22,7 @@ TagManager:
   - Enemy
   - Lava
   - Bullets
-  - 
+  - Interactables
   - 
   - 
   - 
@@ -55,15 +55,18 @@ TagManager:
   - name: Bouncing
     uniqueID: 1654031441
     locked: 0
-  - name: Player
-    uniqueID: 1708752305
+  - name: Platforms
+    uniqueID: 4269396615
+    locked: 0
+  - name: Interactables
+    uniqueID: 423308781
     locked: 0
   - name: Enemy
     uniqueID: 2694890761
     locked: 0
+  - name: Player
+    uniqueID: 1708752305
+    locked: 0
   - name: Lava
     uniqueID: 2986847185
-    locked: 0
-  - name: Platforms
-    uniqueID: 4269396615
     locked: 0

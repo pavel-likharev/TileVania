@@ -145,6 +145,7 @@ public class PlayerController : MonoBehaviour
         isALive = false;
         playerAnimator.SetTrigger("Dying");
         playerRigidbody.velocity = deathkick;
+        FindObjectOfType<GameSession>().ProcessPlayerDeath();
     }
 
     bool IsTouchingPlatforms()
