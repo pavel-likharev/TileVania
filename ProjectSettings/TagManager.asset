@@ -6,6 +6,9 @@ TagManager:
   tags:
   - Enemy
   - Platforms
+  - Coin
+  - Exit
+  - Bouncing
   layers:
   - Default
   - TransparentFX

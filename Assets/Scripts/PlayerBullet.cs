@@ -18,6 +18,8 @@ public class PlayerBullet : MonoBehaviour
 
     void Start()
     {
+        Vector2 vectorFlip = new Vector2(Mathf.Sign(player.GetComponent<Rigidbody2D>().velocity.x), 1f);
+        transform.localScale = vectorFlip;
         xSpeed = player.transform.localScale.x * bulletSpeed;    
     }
 

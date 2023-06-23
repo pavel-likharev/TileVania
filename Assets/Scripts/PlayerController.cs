@@ -1,7 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
-using UnityEditor.Animations;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -11,20 +10,29 @@ public class PlayerController : MonoBehaviour
     [SerializeField] float jumpSpeed = 5f;
     [SerializeField] float climbSpeed = 5f;
     [SerializeField] float shootSpeed = 5f;
+    [SerializeField] float deathDelay = 2f;
     [SerializeField] Vector2 deathkick = new Vector2(10f, 10f);
     [SerializeField] GameObject bulletPrefab;
     [SerializeField] GameObject bulletSpawnPoint;
+
+    [SerializeField] AudioClip coinPickupSFX;
+    [SerializeField] AudioClip shootSFX;
+    [SerializeField] AudioClip damageSFX;
+    [SerializeField] AudioClip teleportSFX;
+    [SerializeField] AudioClip jumpSFX;
     
     Vector2 moveInput;
     Rigidbody2D playerRigidbody;
     Animator playerAnimator;
     CapsuleCollider2D playerCollider;
     BoxCollider2D playerColliderJump;
+    AudioSource playerAudioSource;
 
     
     float gravityScale;
 
     bool isALive = true;
+    bool isTeleporting = false;
 
     void Awake()
     {
@@ -32,13 +40,14 @@ public class PlayerController : MonoBehaviour
         playerAnimator = GetComponent<Animator>();
         playerCollider = GetComponent<CapsuleCollider2D>();
         playerColliderJump = GetComponent<BoxCollider2D>();
+        playerAudioSource = GetComponent<AudioSource>();
 
         gravityScale = playerRigidbody.gravityScale;
     }
 
     void Update()
     {
-        if (!isALive) { return; }
+        if (!isALive || isTeleporting) { return; }
 
         Run();
         FlipSprite();
@@ -56,7 +65,7 @@ public class PlayerController : MonoBehaviour
 
     void OnJump(InputValue value)
     {
-        if (!isALive) { return; }
+        if (!isALive | isTeleporting) { return; }
 
         if (value.isPressed && IsTouchingPlatforms())
         {
@@ -66,7 +75,7 @@ public class PlayerController : MonoBehaviour
 
     void OnFire(InputValue value)
     {
-        if (!isALive) { return; }
+        if (!isALive | isTeleporting) { return; }
 
         if (value.isPressed)
         {
@@ -105,7 +114,7 @@ public class PlayerController : MonoBehaviour
     }
 
     void Jump()
-    {   
+    {
         playerRigidbody.velocity += new Vector2(0f, jumpSpeed);
         playerAnimator.SetBool("isJumping", true);
         
@@ -114,11 +123,16 @@ public class PlayerController : MonoBehaviour
     void Fire()
     {
         if (playerAnimator.GetBool("isRunning"))
+        {
             playerAnimator.Play("PlayerRunAndShoot");
+        }
         else
+        {
             playerAnimator.Play("PlayerShoot");
+        }
 
         Instantiate(bulletPrefab, bulletSpawnPoint.transform.position, transform.rotation);
+        playerAudioSource.PlayOneShot(shootSFX);
     }
 
     void FlipSprite()
@@ -145,7 +159,7 @@ public class PlayerController : MonoBehaviour
         isALive = false;
         playerAnimator.SetTrigger("Dying");
         playerRigidbody.velocity = deathkick;
-        FindObjectOfType<GameSession>().ProcessPlayerDeath();
+        StartCoroutine(RestartAfterDeath());
     }
 
     bool IsTouchingPlatforms()
@@ -163,7 +177,14 @@ public class PlayerController : MonoBehaviour
         return playerCollider.IsTouchingLayers(LayerMask.GetMask("Lava"));
     }
 
-    private void OnCollisionEnter2D(Collision2D collision)
+    IEnumerator RestartAfterDeath()
+    {
+        yield return new WaitForSecondsRealtime(deathDelay);
+
+        FindObjectOfType<GameSession>().ProcessPlayerDeath();
+    }
+
+    void OnCollisionEnter2D(Collision2D collision)
     {
         if (IsTouchingPlatforms())
         {
@@ -172,7 +193,30 @@ public class PlayerController : MonoBehaviour
 
         if (IsTouchingLava() && isALive || IsTouchingEnemy() && isALive)
         {
+            playerAudioSource.PlayOneShot(damageSFX);
             Die();
+        }
+
+        if (collision.gameObject.tag == "Bouncing")
+        {
+            playerAudioSource.PlayOneShot(jumpSFX);
+        }
+    }
+
+    void OnTriggerEnter2D(Collider2D collision)
+    {
+        if (collision.tag == "Exit")
+        {
+            isTeleporting = true;
+            Vector2 vectorFlip = new Vector2(Mathf.Sign(playerRigidbody.velocity.x), 1f);
+            playerRigidbody.velocity = vectorFlip;
+            playerAudioSource.PlayOneShot(teleportSFX);
+            playerAnimator.SetTrigger("Teleporting");
+        }
+
+        if (collision.tag == "Coin")
+        {
+            playerAudioSource.PlayOneShot(coinPickupSFX);
         }
     }
 }
